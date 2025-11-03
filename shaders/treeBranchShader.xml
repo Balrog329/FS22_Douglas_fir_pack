@@ -1,0 +1,481 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<CustomShader version="5">
+    <Groups>
+        <Group name="seasonal" define="SEASONAL"/>
+        <Group name="seasonalFlowers" define="SEASONAL_FLOWERS"/>
+    </Groups>
+    <Parameters>
+        <Parameter name="windSnowLeafScale"       target="windSnowLeafScale"        type="float4" group="base"            defaultValue="1.0 1.0 1.0 0"  minValue="0.0 0.0 0.0 0" maxValue="1.0 1.0 1.0 10000.0" description="meant to be used when tree is cut\nX * wind intensity\nY * snow intensity\nZ==1 - leaves are visible, Z==0 - no leaves\nif W>0.0 then W replaces (pos.x + pos.y + pos.z) for colorTint and timeOffset"/>
+        <Parameter name="seasonalTintIntensity"   target="seasonalTintIntensity"    type="float3" group="seasonal"        defaultValue="0.30 0.30 0.40" minValue="0.0 0.0 0.0"   maxValue="1.0 1.0 1.0"         description="Tint color in Spring,Summer,Autumn (based on position, 0..1 normalized)\nlerp( SpringColor, float3(0.335,0.620,0.049), X*rndPerTree )\nlerp( SummerColor, float3(0.026,0.097,0.029), Y*rndPerTree )\nlerp( AutumnColor, float3(0.981,0.000,0.000), Z*rndPerTree )"/>
+        <Parameter name="leavesSeasonGrowing"     target="leavesSeasonGrowing"      type="float2" group="seasonal"        defaultValue="3.00 0.66"      minValue="3.0 0.33"      maxValue="3.66 1.0"            description="should be in the range 3.0..4.0\nX - leaves growing start\nY - duration of the leaves growing\nformula: fitRange(season,X,X+Y,0.0,1.0)"/>
+        <Parameter name="flowersSeason"           target="flowersSeason"            type="float2" group="seasonalFlowers" defaultValue="3.00 1.00"      minValue="2.6 0.5"       maxValue="4.5 1.0"             description="X - start of the flowering season (should be in the range 2.6..4.5)\nImportant: if you want to start in Summer use value above 4.0 instead of 0.0\nY - duration of the flowering season (should be in the range 0.5..1.0)"/>
+        <Parameter name="isBackFaceNormalFlipped" target="isBackFaceNormalFlipped"  type="float"  group="base"            defaultValue="0"              minValue="0"             maxValue="1"                   description="X>0 - flipping normals for back facing triangles\n intended to be used with doubleSided feature enabled"/>
+    </Parameters>
+    <UvUsages/>
+    <Textures>
+        <Texture name="mMaskMap" group="seasonal" defaultColorProfile="linearRGB"/>
+        <Texture name="mFlowersBaseMap"     group="seasonalFlowers" defaultColorProfile="sRGB"/>
+        <Texture name="mFlowersNormalMap"   group="seasonalFlowers" defaultColorProfile="linearRGB" />
+        <Texture name="mFlowersSpecularMap" group="seasonalFlowers" defaultColorProfile="linearRGB" />
+        <Texture name="mFlowersMaskMap"     group="seasonalFlowers" defaultColorProfile="linearRGB" />
+    </Textures>
+    <Variations>
+        <Variation name="SEASONAL" groups="base seasonal">
+            <UvUsages>
+                <UvUsage textureName="baseMap"  uvType="uv0" uvScale="0.5"/>
+            </UvUsages>
+        </Variation>
+        <Variation name="SEASONAL_FLOWERS" groups="base seasonal seasonalFlowers">
+            <UvUsages>
+                <UvUsage textureName="baseMap"  uvType="uv0" uvScale="0.5"/>
+            </UvUsages>
+        </Variation>
+    </Variations>
+    <LodLevel startDistance="0" alphaForceMode="use">
+        <CodeInjections>
+            <CodeInjection position="CONFIG_DEFINES">
+<![CDATA[
+#if defined(SEASONAL)
+    #define ALPHA_TESTED
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="OBJECT_PARAMETERS">
+<![CDATA[
+// Season states:
+// cShared3 [0.0..1.0] Summer
+// cShared3 [1.0..2.0] Autumn
+// cShared3 [2.0..3.0] Winter
+// cShared3 [3.0..4.0] Spring
+// cShared4 [0.0..5.0] Snow control, only 0..1 used in this shader
+/*
+    0.00 [0.000..0.333] = June      - fully spring green
+    0.33 [0.333..0.666] = July      - 
+    0.66 [0.666..1.000] = August    - fully dark green
+    1.00 [1.000..1.333] = September - half green/orange
+    1.33 [1.333..1.666] = October   - fully orange
+    1.66 [1.666..2.000] = November  - loosing leaves
+    2.00 [2.000..2.333] = December  - no leaves
+    2.33 [2.333..2.666] = January   - no leaves
+    2.66 [2.666..3.000] = February  - no leaves
+    3.00 [3.000..3.333] = March     - small leaves
+    3.33 [3.333..3.666] = April     - growing leaves
+    3.66 [3.666..3.999] = May       - fully spring green
+*/
+/*
+    Meant to be used when tree is cut
+    windSnowLeafScale.x - wind intensity * this value
+    windSnowLeafScale.y - snow intensity * this value
+    windSnowLeafScale.z - 1 - leaves are visible, 0 - no leaves
+    windSnowLeafScale.w - if this value > 0.0 
+                          this value replaces (pos.x + pos.y + pos.z) 
+                          for colorTint and timeOffset
+*/
+float4 windSnowLeafScale;
+/*
+    isBackFaceNormalFlipped.x>0 - flipping normals for back facing triangles
+    intended to be used with doubleSided feature enabled
+*/
+float isBackFaceNormalFlipped;
+#if defined(SEASONAL)
+/*
+    seasonalTintIntensity.x - spring
+    seasonalTintIntensity.y - summer
+    seasonalTintIntensity.z - autumn
+*/
+    float3 seasonalTintIntensity;
+/*
+    leavesSeasonGrowing.x - leaves growing start
+    leavesSeasonGrowing.y - duration of the leaves growing
+    growing leaves: fitRange(season,X,X+Y,0.0,1.0)
+*/
+    float2 leavesSeasonGrowing;
+#endif
+#if defined(SEASONAL_FLOWERS)
+/*
+    flowersSeason.x - start of the flowering season (should be in the range 2.6..4.5)
+                      Important: if you want to start in Summer use value above 4.0 instead of 0.0
+    flowersSeason.y - duration of the flowering season (should be in the range 0.5..1.0)
+*/
+    float2 flowersSeason;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="LIB_FUNCTION">
+<![CDATA[
+// Custom pixel/vertex functions
+#include "$data/shaders/sharedFunctions.gsl"
+// Extra functions related to the treeBranchShader only
+]]>
+            </CodeInjection>
+            <CodeInjection position="LIB_FUNCTION_VS">
+<![CDATA[
+// Custom vertex functions
+#include "$data/shaders/sharedFunctions_vs.gsl"
+// Extra functions related to the treeBranchShader only
+float3 getTrunkBranchAnimationOffset(VS_INPUT In, PerInstanceParameters& instance, ObjectParameters& object, 
+                                float mTime, float windStrength){
+    // Trunk animation
+    TrunkOffsetStruct trunkOffsetPacked = getTrunkAnimationOffset(In,instance,object,mTime,windStrength);
+    float3 trunkOffset       = trunkOffsetPacked.trunkOffset;
+    float  treeVarSeed       = trunkOffsetPacked.treeVarSeed;
+    float3 windDirection     = trunkOffsetPacked.windDirection;
+    float3 windSideDirection = trunkOffsetPacked.windSideDirection;
+    // ----
+    // Branch animation
+    float branchVarSeed = (In.position.x+In.position.y+In.position.z) + treeVarSeed;
+    float branchDistanceToTrunk = saturate( In.generic*100 / 25.0);
+    // ----
+    float3 branchMoveDirection = windDirection;
+    branchMoveDirection = normalize(branchMoveDirection + windSideDirection*sin(branchVarSeed)*0.3);
+    // ----
+    float pi = 3.14159265359;
+    float x1 = 0.20*mTime - 0.100*branchVarSeed;
+    float x2 = 0.30*mTime - 0.025*branchVarSeed;
+    float branchMove1 =  cos(x1*pi*0.4)*cos(x1*pi*2)+sin(7*x1*pi)*0.4;
+    float branchMove2 =  cos(x2*pi*0.4)*cos(x2*pi*2)+sin(7*x2*pi)*0.4;
+    branchMove1 = fitRange(branchMove1,-1,1,0.0,1.0);
+    branchMove2 = fitRange(branchMove2,-1,1,0.0,2.0);
+    float branchMove = lerp(branchMove1, branchMove2, windStrength);
+    // ----
+    branchMove *= 0.75*(windStrength * 0.2 + 0.8);
+    branchMove *= branchDistanceToTrunk*0.2;
+    // ----
+    return (branchMoveDirection*branchMove + trunkOffset);
+}
+]]>
+            </CodeInjection>
+            <CodeInjection position="VS_OUTPUT">
+<![CDATA[
+#if defined(SEASONAL)
+    float3 randTintBranchDistance : TEXCOORDn;
+    float2 texCoordsWinter        : TEXCOORDn;
+    float2 texCoordsSpring        : TEXCOORDn;
+    float2 texCoordsSummer        : TEXCOORDn;
+    float2 texCoordsAutumn        : TEXCOORDn;
+    #if defined(SEASONAL_FLOWERS)
+        float2 texCoordsFlowers : TEXCOORDn;
+    #endif
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="POST_SET_TEXCOORDS_VS">
+<![CDATA[
+#if defined(SEASONAL)
+    {
+        Out.randTintBranchDistance.xy = getRandFromPos( In, instance, object, object.windSnowLeafScale.w).xy;
+        Out.randTintBranchDistance.z = saturate( In.generic*100 / 5.0);
+    }
+    float2 mUV = getDefaultTexCoords(In, instance, object);
+    Out.texCoordsWinter = mUV*float2(0.5,0.5) + float2(0.5,0.0);
+    Out.texCoordsSpring = mUV*float2(0.5,0.5) + float2(0.0,0.5);
+    Out.texCoordsSummer = mUV*float2(0.5,0.5) + float2(0.5,0.5);
+    Out.texCoordsAutumn = mUV*float2(0.5,0.5) + float2(0.0,0.0);
+    #if defined(SEASONAL_FLOWERS)
+        Out.texCoordsFlowers = mUV;
+    #endif
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="POST_GET_WORLD_POSE_VS">
+<![CDATA[
+//float3 windDirection = float3(1, 0, 0);
+float windStrength = cShared0*object.windSnowLeafScale.x;
+#if !defined(DEPTH_VIS) // avoid shadow artefacts by not animating in the shadow map
+    if (windStrength > 0.0001) {
+        // current pos
+        worldPosition += getTrunkBranchAnimationOffset(In,instance,object,cTime_s,windStrength);
+        // previous pos
+        prevWorldPosition += getTrunkBranchAnimationOffset(In,instance,object,cPrevTime_s,windStrength);
+    }
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="LIB_FUNCTION_FS">
+<![CDATA[
+// Custom pixel functions
+#include "$data/shaders/sharedFunctions_fs.gsl"
+// Extra functions related to the treeBranchShader only
+float getLeavesUVdistortion(ObjectParameters& object, float leavesGrow, float leavesRand){
+    const float pi = 3.141592654;
+    float leavesMask = clamp(2*leavesGrow,0.0,1.0);
+    float leavesGradient = (1-leavesGrow);
+    float windStrength = 0.005 * cShared0 * object.windSnowLeafScale.x;
+    return windStrength*leavesGradient*leavesMask*(triangleWave( 0.5*pi*cTime_s + 1.5*pi*leavesRand )-0.5);
+}
+]]>
+            </CodeInjection>
+            <CodeInjection position="FS_GLOBALS">
+<![CDATA[
+    float2 gSnowMask;
+    bool   gIsSnowing;
+    float3 gSnowDiffuse;
+    float3 gSnowSpecular;
+    float3 gSpecular; // specular.b - used as a mask for snow
+#if defined(SEASONAL)
+    float gSeason;        // shifted current seasons, used to make transition between 0->4 continues
+    float gBranchesMask;  // 0..1   stencil-style mask only for branches
+    float gLeavesMask;    // 0..1   stencil-style mask only for leaves
+    float gLeavesGrow;    // 0.5..1 radial growing gradient mask only for leaves
+    float gLeavesRand;    // 0..1   random value per leaf
+    float gAlpha;         // alpha channel
+    float gLeafRustling;  // uv distortion of the leaves
+    float3 gDiffuseColor; // diffuse color
+    float3 gTangentSpaceNormal; // unnormalized tangent space normal
+    #if defined(SEASONAL_FLOWERS)
+        float gFlowersMask; // 0..1   stencil-style mask only for branches
+        float gFlowersGrow; // 0.5..1 radial growing gradient mask only for flowers
+        float gFlowersRand; // 0..1   random value per flower
+    #endif
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="START_FS">
+<![CDATA[
+    // --------------------------------------------------------------------------------------------------
+    // Snow mixing code
+    globals.gSnowDiffuse  = float3(0.7300,0.7668,0.8356);
+    globals.gSnowSpecular = float3(0.1922,0.8706,0.0000);
+    globals.gSnowMask  = float2(0.0,0.0);
+    globals.gIsSnowing = cShared4 > 0.001 && object.windSnowLeafScale.y > 0.0;
+    globals.gSpecular = float3(0.19,1.0,0.0);
+    // --------------------------------------------------------------------------------------------------
+#if defined(GLOSS_MAP)
+    globals.gSpecular = tex2DSample(glossMap, GLOSS_MAP_SAMPLER, GLOSS_MAP_TEXCOORDS, GLOSS_MAP_LAYER).rgb;
+    globals.gSnowMask.x = globals.gSpecular.z; // specular.b - used as a mask for snow
+#endif
+#if defined(SEASONAL)
+    float3 mMask = tex2DSample(mMaskMap, standardMaterialSampler, ALBEDO_MAP_TEXCOORDS).xyz;
+    // load branches mask before distorting uv's
+    globals.gLeafRustling = 0.0;
+    // --------------------------------------------------------------------------------------------------
+    #if GPU_PROFILE >= GPU_PROFILE_HIGH && !defined(SEASONAL_FLOWERS)
+        #if !defined(DEPTH_VIS) // avoid shadow artefacts by not animating in the shadow map
+            // load leaves uv's distortion
+            globals.gLeafRustling = getLeavesUVdistortion(object,mMask.y, mMask.z);
+            // sample mask again with distorted uv's
+            float3 mMaskDistorted = tex2DSample(mMaskMap, standardMaterialSampler, ALBEDO_MAP_TEXCOORDS + globals.gLeafRustling).xyz;
+            mMask.yz = mMaskDistorted.yz;
+        #endif
+    #endif
+    // --------------------------------------------------------------------------------------------------
+    globals.gAlpha = 1.0;
+    globals.gSeason = getSeason(cShared3, In.vs.randTintBranchDistance);
+    // --------------------------------------------------------------------------------------------------
+    #if defined(ALBEDO_MAP)
+        float3 mColorBranches = tex2DSample(baseMap, ALBEDO_MAP_SAMPLER, In.vs.texCoordsWinter).rgb;
+        float3 mColorSpring   = tex2DSample(baseMap, ALBEDO_MAP_SAMPLER, In.vs.texCoordsSpring + globals.gLeafRustling).rgb;
+        float3 mColorSummer   = tex2DSample(baseMap, ALBEDO_MAP_SAMPLER, In.vs.texCoordsSummer + globals.gLeafRustling).rgb;
+        float3 mColorAutumn   = tex2DSample(baseMap, ALBEDO_MAP_SAMPLER, In.vs.texCoordsAutumn + globals.gLeafRustling).rgb;
+    #else
+        float3 mColorBranches = float3(0,0,0);
+        float3 mColorSpring   = float3(0,0,0);
+        float3 mColorSummer   = float3(0,0,0);
+        float3 mColorAutumn   = float3(0,0,0);
+    #endif
+    globals.gTangentSpaceNormal = float3(0.5,0.5,1.0);
+    #if defined(NORMAL_MAP)
+        globals.gTangentSpaceNormal = tex2DSample( normalMap, NORMAL_MAP_SAMPLER, NORMAL_MAP_TEXCOORDS + globals.gLeafRustling).xyz - 0.5;
+    #endif
+    // --------------------------------------------------------------------------------------------------
+    SeasonalBranchesLeavesStruct seasonalBranchesLeavesData = getSeasonalBranchesLeaves(globals.gSeason, object.leavesSeasonGrowing.x, object.leavesSeasonGrowing.y,
+                                                                                        mMask,object.windSnowLeafScale.z,
+                                                                                        mColorBranches,mColorSpring,mColorSummer,mColorAutumn,
+                                                                                        In.vs.randTintBranchDistance.y,object.seasonalTintIntensity);
+    // --------------------------------------------------------------------------------------------------
+    globals.gDiffuseColor = seasonalBranchesLeavesData.diffuseColor;
+    globals.gAlpha        = seasonalBranchesLeavesData.alpha;
+    globals.gBranchesMask = seasonalBranchesLeavesData.branchesMask;
+    globals.gLeavesMask   = seasonalBranchesLeavesData.leavesMask;
+    globals.gLeavesGrow   = seasonalBranchesLeavesData.leavesGrow;
+    globals.gLeavesRand   = seasonalBranchesLeavesData.leavesRand;
+    // --------------------------------------------------------------------------------------------------
+    #if defined(SEASONAL_FLOWERS)
+        float3 mFlowersMask = tex2DSample(mFlowersMaskMap, standardMaterialSampler, ALBEDO_MAP_TEXCOORDS).xyz;
+        #if defined(ALBEDO_MAP)
+            float3 mColorFlowers = tex2DSample(mFlowersBaseMap, ALBEDO_MAP_SAMPLER, In.vs.texCoordsFlowers ).rgb;
+        #else
+            float3 mColorFlowers = float3(0,0,0);
+        #endif
+        // --------------------------------------------------------------------------------------------------
+        SeasonalFlowersStruct seasonalFlowersData = getSeasonalFlowers(globals.gSeason,object.flowersSeason.x,object.flowersSeason.y,globals.gDiffuseColor,globals.gAlpha,mFlowersMask,object.windSnowLeafScale.z,mColorFlowers);
+        globals.gDiffuseColor  = seasonalFlowersData.diffuseColor;
+        globals.gAlpha         = seasonalFlowersData.alpha;
+        float mFlowersOverTime = seasonalFlowersData.flowersOverTime;
+        globals.gFlowersMask   = seasonalFlowersData.flowersMask;
+        globals.gFlowersGrow   = seasonalFlowersData.flowersGrow;
+        globals.gFlowersRand   = seasonalFlowersData.flowersRand;
+        // --------------------------------------------------------------------------------------------------
+        #if defined(NORMAL_MAP)
+            float3 mOrigNormal = tex2DSample( normalMap, NORMAL_MAP_SAMPLER, NORMAL_MAP_TEXCOORDS).xyz - 0.5;
+            float3 mFflowersNormal = tex2DSample( mFlowersNormalMap, NORMAL_MAP_SAMPLER, NORMAL_MAP_TEXCOORDS).xyz - 0.5;
+            globals.gTangentSpaceNormal = lerp(mOrigNormal,mFflowersNormal,mFlowersOverTime);
+        #endif
+        #if defined(GLOSS_MAP)
+            float3 mFlowersSpecular = tex2DSample(mFlowersSpecularMap, GLOSS_MAP_SAMPLER, GLOSS_MAP_TEXCOORDS, GLOSS_MAP_LAYER).rgb;
+            globals.gSpecular = lerp(globals.gSpecular,mFlowersSpecular,mFlowersOverTime);
+            globals.gSnowMask.x = globals.gSpecular.z; // specular.b - used as a mask for snow
+        #endif
+    #endif
+    // --------------------------------------------------------------------------------------------------
+    #if defined(DEBUG_SHOW_CUSTOM1)
+        // NEED FOR LOD BAKING
+        globals.gDiffuseColor = lerp(mColorBranches,mColorSummer,globals.gLeavesMask);
+        globals.gAlpha = globals.gBranchesMask + globals.gLeavesGrow;
+        if (1.0 == cShared3 ) {
+            globals.gDiffuseColor = lerp(mColorBranches,mColorAutumn,globals.gLeavesMask);
+        } else if ( 2.0 == cShared3 ) {
+            globals.gDiffuseColor = mColorBranches;
+            globals.gAlpha = globals.gBranchesMask;
+        } else if ( 3.0 == cShared3 ) {
+            globals.gDiffuseColor = lerp(mColorBranches,mColorSpring,globals.gLeavesMask);
+        } else if ( 6.0 == cShared3 ) {
+            #if defined(SEASONAL_FLOWERS)
+                globals.gDiffuseColor = mColorFlowers;
+                globals.gAlpha = globals.gFlowersGrow;
+            #endif
+        } else if ( 6.5 == cShared3 ) {
+            #if defined(SEASONAL_FLOWERS)
+                globals.gDiffuseColor = srgb_to_linear(float3(0.0,globals.gFlowersGrow,globals.gFlowersRand));
+                globals.gAlpha = globals.gFlowersGrow;
+            #endif
+        }
+    #elif defined(DEBUG_SHOW_CUSTOM2)
+        // NEED FOR LOD BAKING
+        globals.gDiffuseColor = mColorSummer;
+        globals.gAlpha = globals.gLeavesGrow;
+        if (1.0 == cShared3){
+            globals.gDiffuseColor = mColorAutumn;
+        } else if (2.0 == cShared3) {
+            globals.gDiffuseColor = mColorBranches;
+            globals.gAlpha = globals.gBranchesMask;
+        } else if (3.0 == cShared3){
+            globals.gDiffuseColor = mColorSpring;
+        } else if (4.0 == cShared3 ) {
+            globals.gDiffuseColor = srgb_to_linear(float3(0.0,globals.gLeavesGrow,globals.gLeavesRand));
+            globals.gAlpha = globals.gLeavesGrow;
+        }
+    #endif
+    // --------------------------------------------------------------------------------------------------
+#endif
+globals.gSpecular.z = 0.0; // we do not have metalness on the branches
+]]>
+            </CodeInjection>
+            <CodeInjection position="GET_UNNORMALIZED_TANGENT_SPACE_NORMAL_FS">
+<![CDATA[
+#if defined(NORMAL_MAP) && defined(SEASONAL)
+    return globals.gTangentSpaceNormal;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="GET_NORMAL_FS">
+<![CDATA[
+{
+    float3 customNormal;
+    #ifdef NORMAL_MAP
+        float3 normal = getUnnormalizedTangentSpaceNormal(In, globals, instance, object);
+        float3 tangentSpaceNormal = In.vs.worldNormal.xyz;
+        float3 tangentSpaceTangent = In.vs.worldTangent.xyz;
+        float3 tangentSpaceBitangent = cross(tangentSpaceNormal, tangentSpaceTangent)*In.vs.worldTangent.w;
+        float3x3 worldToTangentSpaceMat = float3x3(tangentSpaceTangent, tangentSpaceBitangent, tangentSpaceNormal);
+        customNormal = normalize(mul(normal.xyz, worldToTangentSpaceMat).xyz);
+    #else
+        customNormal = normalize(In.vs.worldNormal);
+    #endif
+    if ( object.isBackFaceNormalFlipped.x > 0 && !In.frontFacing ){
+        customNormal = -customNormal;
+    }
+    return customNormal;
+}
+]]>
+            </CodeInjection>
+            <CodeInjection position="POST_DIFFUSE_COLOR_FS">
+<![CDATA[
+#if defined(SEASONAL)
+    diffuseColor = globals.gDiffuseColor;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="POST_GLOSS_COLOR_FS">
+<![CDATA[
+    float3 mPbrMapValues = globals.gSpecular;
+    { // Snow mixing code
+        if (globals.gIsSnowing){
+            // diffuse snow mixing
+            globals.gSnowMask = getSnowMaskSimple(object.windSnowLeafScale.y,globals.gSnowMask.x);
+            diffuseColor.rgb = lerp( diffuseColor.rgb, globals.gSnowDiffuse.rgb, globals.gSnowMask.y );
+            // specular snow mixing
+            mPbrMapValues = lerp( mPbrMapValues, globals.gSnowSpecular, globals.gSnowMask.y );
+        }
+    }
+    roughness = 1-mPbrMapValues.x;
+    bakedAO   = mPbrMapValues.y;
+    metalness = mPbrMapValues.z;
+]]>
+            </CodeInjection>
+            <CodeInjection position="POST_WETNESS_FS">
+<![CDATA[
+if(cWetness > 0.001 && object.windSnowLeafScale.y > 0.0) {
+    porosity = 0.25;
+    // use snow factor as a parameter for cut trees
+    wetness = cWetness * object.windSnowLeafScale.y;
+}
+]]>
+            </CodeInjection>
+            <CodeInjection position="ALPHA_FS">
+<![CDATA[
+#if defined(SEASONAL)
+    alpha = globals.gAlpha;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="GET_LIGHTING_POST_SHADING_ANGLES_FS">
+<![CDATA[
+{
+    float unclampedNdotL = dot(normal, lightDir);
+    diffuseIrradiance = atten * saturate(unclampedNdotL > 0.0 ? unclampedNdotL : -unclampedNdotL * 0.35);
+    
+}
+]]>
+            </CodeInjection>
+            <CodeInjection position="FINAL_POS_FS">
+<![CDATA[
+{
+    #if defined(DEBUG_SHOW_ALPHA)
+        #undef ALPHA_TESTED
+        oColor.xyz *= 0.0001;
+        // NEED FOR LOD BAKING
+        #if defined(SEASONAL)
+            oColor.xyz += srgb_to_linear(float3(globals.gLeavesRand,globals.gLeavesGrow,0));
+        #endif
+    #endif
+    #if defined(DEBUG_SHOW_CUSTOM1)
+        // NEED FOR LOD BAKING
+        oColor.xyz *= 0.0001;
+        oColor.xyz += diffuseColor;
+        if (5.0 == cShared3 ) {
+            oColor.xyz *= 0.0001;
+            oColor.xyz += srgb_to_linear(float3(1.0-roughness,bakedAO,globals.gSnowMask.x));
+        }
+    #endif
+    #if defined(DEBUG_SHOW_CUSTOM2)
+        oColor.xyz *= 0.0001;
+        #if defined(SEASONAL)
+            oColor.xyz += diffuseColor;
+        #endif
+    #endif
+}
+]]>
+            </CodeInjection>
+            <CodeInjection position="SCREEN_SPACE_REFLECTIONS_EXPORT_PRE_MASKING">
+<![CDATA[
+{
+    //don't apply SSR for this material
+    forceMask = true;
+}
+]]>
+            </CodeInjection>
+        </CodeInjections>
+    </LodLevel>
+</CustomShader>

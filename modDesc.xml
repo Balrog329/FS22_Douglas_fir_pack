@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<modDesc descVersion="65">
+    <author>Balrog329</author>
+    <version>1.0.0.0</version>
+    <title>
+        <en>Douglas_fir_pack</en>
+        <fr>Pack de sapin de douglas</fr>
+    </title>
+    <description>
+        <en> Diversify your forest stands and boost your income with the Douglas Fir Pack. The Douglas fir is a North American conifer that can grow up to 40 meters tall! Renowned for the quality of its timber, it offers a great way to expand your forestry production. You can purchase seedling pallets from the store, plant them, and watch them grow. These trees are fully harvestable with forestry equipment and can be sold at the sawmill. But beware of appearances—an overgrown Douglas fir, while highly profitable, can quickly render your harvesters useless. Whether you're a die-hard productivity enthusiast or simply enjoy the forest ambiance, this tree pack is perfect for your farm.</en>
+		<fr>Diversifiez vos peuplements forestiers et vos revenus avec le pack de sapin de Douglas. Le Douglas est un conifère nord-américain pouvant atteindre 40 m de haut ! Connu pour la qualité de son bois, il vous permettra de diversifier votre production forestière. Vous pourrez acheter des palettes de plants au magasin, les planter et les voir grandir. Les arbres sont entièrement récoltables avec les engins forestiers et vendables en scierie. Cependant, attention aux apparences car un douglas trop âgé, malgré sa rentabilité, peut vite mettre vos abatteuses hors service. Que vous soyez un fervent adepte de la productivité forestière ou simplement amoureux de l’atmosphère boisée, ce pack d’arbres est fait pour votre ferme.</fr>
+    </description>
+    <iconFilename>icon.dds</iconFilename>
+    <multiplayer supported="true"/>
+	
+	<extraSourceFiles>
+        <sourceFile filename="scripts/addTreeTypes.lua" />
+        <sourceFile filename="scripts/DouglasDeath.lua" />
+    </extraSourceFiles>	
+	
+    <storeItems>
+        <storeItem xmlFilename="PL75/pl75.xml"/>	
+        <storeItem xmlFilename="treeSaplingPallet/treeSaplingPallet316.xml" rootNode="vehicle"/>	
+		<storeItem xmlFilename="trees/douglasFir/douglas_stage01.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/douglas_stage02.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/douglas_stage03.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/douglas_stage04.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/douglas_stage05.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/douglas_stage06.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/douglas_stage07.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/douglas_stage07_dying.xml"/>
+		<storeItem xmlFilename="trees/dryBranches/douglasBranches.xml"/>
+		<storeItem xmlFilename="trees/dryBranches/douglasBranches2.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/drydouglas_stage05.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/drydouglas_stage06.xml"/>
+		<storeItem xmlFilename="trees/douglasFir/drydouglas_stage07.xml"/>
+    </storeItems>	
+
+	<l10n>
+	    <text name="treeType_douglasFir">
+            <en>douglas_fir</en>
+            <fr>sapin de douglas</fr>
+		</text>
+	    <text name="treeType_drydouglas">
+            <en>dry douglas</en>
+            <fr>douglas sec</fr>
+		</text>
+	    <text name="treeType_douglasBranches">
+            <en>douglas dry branches</en>
+            <fr>branches mortes de douglas</fr>
+		</text>
+		<text name="fillType_316_douglas_Saplings">
+          <en>316 douglas pine seedlings</en>
+          <fr>316 semis de douglas</fr>		  
+        </text>
+        <text name="storeItem_douglas_stage1">
+          <en>Douglas Fir - Stage bush</en>
+          <fr>Sapin de Douglas – Stade fourré</fr>
+        </text>
+        <text name="storeItem_douglas_stage2">
+          <en>Douglas Fir - Stage gauls</en>
+          <fr>Sapin de Douglas – Stade gaulis</fr>
+        </text>
+        <text name="storeItem_douglas_stage3">
+          <en>Douglas Fir - Stage perch</en>
+          <fr>Sapin de Douglas – Stade perchis</fr>
+        </text>
+        <text name="storeItem_douglas_stage4">
+          <en>Douglas Fir - Stage young</en>
+          <fr>Sapin de Douglas – Stade jeune futaie</fr>
+        </text>
+        <text name="storeItem_douglas_stage5">
+          <en>Douglas Fir - Stage mid</en>
+          <fr>Sapin de Douglas – Stade futaie moyenne</fr>
+        </text>
+        <text name="storeItem_douglas_stage6">
+          <en>Douglas Fir - Stage adult</en>
+          <fr>Sapin de Douglas – Stade futaie adulte</fr>
+        </text>
+        <text name="storeItem_douglas_stage07">
+          <en>Douglas Fir - Stage old</en>
+          <fr>Sapin de Douglas – Stade vieille futaie</fr>
+        </text>
+        <text name="storeItem_douglas_stage07_dying">
+          <en>Douglas Fir - Stage dying forest</en>
+          <fr>Sapin de Douglas – Stade vieille futaie dépérissante</fr>
+        </text>
+		<text name="storeItem_douglasBranches1">
+          <en>Douglas Fir - dry branches 1</en>
+          <fr>Sapin de Douglas – branches mortes 1</fr>
+		</text>
+		<text name="storeItem_douglasBranches2">
+          <en>Douglas Fir - dry branches 2</en>
+          <fr>Sapin de Douglas – branches mortes 2</fr>
+		</text>  
+	    <text name="storeItem_drydouglas_stage05">
+            <en>dry douglas - stage mid</en>
+            <fr>douglas sec - stade futaie moyenne</fr>
+        </text>
+        <text name="storeItem_drydouglas_stage6">
+          <en>dry douglas - Stage adult</en>
+          <fr>douglas sec – Stade futaie adulte</fr>
+        </text>
+        <text name="storeItem_drydouglas_stage7">
+          <en>dry douglas - Stage old</en>
+          <fr>douglas sec – Stade vieille futaie</fr>
+        </text>
+	</l10n>
+</modDesc>

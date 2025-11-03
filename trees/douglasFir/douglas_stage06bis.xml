@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<placeable type="tree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../shared/xml/schema/placeable.xsd">
+    <storeData>
+        <name>$l10n_storeItem_douglas_stage6</name>
+        <functions>
+            <function>$l10n_function_decoration</function>
+        </functions>
+        <image>trees/douglasFir/store_douglas_stage06.dds</image>
+
+        <price>3000</price>
+        <dailyUpkeep>0</dailyUpkeep>
+        <lifetime>1000</lifetime>
+        <rotation>0</rotation>
+        <brand>LIZARDFORESTRY</brand>
+        <species>placeable</species>
+        <category>trees</category>
+        <canBeSold>true</canBeSold>
+        <showInStore>true</showInStore>
+
+        <brush>
+            <type>tree</type>
+            <category>landscaping</category>
+            <tab>trees</tab>
+            <parameters>
+                <parameter>douglasFir</parameter> <!-- tree type name -->
+                <parameter>8</parameter> <!-- stage -->
+            </parameters>
+        </brush>
+        <vertexBufferMemoryUsage>12032</vertexBufferMemoryUsage>
+        <indexBufferMemoryUsage>2048</indexBufferMemoryUsage>
+        <textureMemoryUsage>1245184</textureMemoryUsage>
+        <audioMemoryUsage>0</audioMemoryUsage>
+        <instanceVertexBufferMemoryUsage>0</instanceVertexBufferMemoryUsage>
+        <instanceIndexBufferMemoryUsage>0</instanceIndexBufferMemoryUsage>
+    </storeData>
+    <base>
+        <filename>trees/douglasFir/douglas_stage06bis.i3d</filename>
+    </base>
+    <type>douglasFir</type> 
+
+</placeable>

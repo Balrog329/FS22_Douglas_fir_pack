@@ -1,0 +1,54 @@
+<<<<<<< HEAD
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<map>
+    <treeTypes>
+        <treeType name="douglasFir" nameI18N="treeType_douglasFir" splitType="100" title="$l10n_storeItem_douglasFir" growthTimeHours="820" saplingPrice="0" canBeMarked="true">
+            <stage filename="treeSaplingPallet/treeSapling.i3d"/>
+            <stage filename="trees/douglasFir/douglas_stage01.i3d"/>
+            <stage filename="trees/douglasFir/douglas_stage02.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage03.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage04.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage05.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage06.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage06bis.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage07.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage07_dying.i3d"/>
+        </treeType>
+		<treeType name="douglasBranches" nameI18N="treeType_douglasBranches" splitType="101" title="$l10n_storeItem_douglasBranches" growthTimeHours="2" saplingPrice="0" canBeMarked="true">
+			<stage filename="trees/dryBranches/drybranches1.i3d"/>
+			<stage filename="trees/dryBranches/drybranches2.i3d"/>
+		</treeType>
+		<treeType name="drydouglas" nameI18N="treeType_drydouglas" splitType="102" title="$l10n_storeItem_drydouglas" growthTimeHours="100" saplingPrice="0" canBeMarked="true">
+			<stage filename="trees/douglasFir/drydouglas_stage05.i3d"/>
+			<stage filename="trees/douglasFir/drydouglas_stage06.i3d"/>
+			<stage filename="trees/douglasFir/drydouglas_stage07.i3d"/>
+		</treeType>
+	</treeTypes>  
+=======
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<map>
+    <treeTypes>
+        <treeType name="douglasFir" nameI18N="treeType_douglasFir" splitType="100" title="$l10n_storeItem_douglasFir" growthTimeHours="820" saplingPrice="0" canBeMarked="true">
+            <stage filename="treeSaplingPallet/treeSapling.i3d"/>
+            <stage filename="trees/douglasFir/douglas_stage01.i3d"/>
+            <stage filename="trees/douglasFir/douglas_stage02.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage03.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage04.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage05.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage06.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage06bis.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage07.i3d"/>
+			<stage filename="trees/douglasFir/douglas_stage07_dying.i3d"/>
+        </treeType>
+		<treeType name="douglasBranches" nameI18N="treeType_douglasBranches" splitType="101" title="$l10n_storeItem_douglasBranches" growthTimeHours="2" saplingPrice="0" canBeMarked="true">
+			<stage filename="trees/dryBranches/drybranches1.i3d"/>
+			<stage filename="trees/dryBranches/drybranches2.i3d"/>
+		</treeType>
+		<treeType name="drydouglas" nameI18N="treeType_drydouglas" splitType="102" title="$l10n_storeItem_drydouglas" growthTimeHours="100" saplingPrice="0" canBeMarked="true">
+			<stage filename="trees/douglasFir/drydouglas_stage05.i3d"/>
+			<stage filename="trees/douglasFir/drydouglas_stage06.i3d"/>
+			<stage filename="trees/douglasFir/drydouglas_stage07.i3d"/>
+		</treeType>
+	</treeTypes>  
+>>>>>>> 44bf5fb (latest version)
+</map>
