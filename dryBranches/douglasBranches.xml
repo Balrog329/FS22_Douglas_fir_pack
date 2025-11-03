@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <placeable type="tree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../shared/xml/schema/placeable.xsd">
     <storeData>
@@ -40,46 +39,3 @@
     <type>douglasBranches</type> 
 
 </placeable>
-=======
-<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<placeable type="tree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../shared/xml/schema/placeable.xsd">
-    <storeData>
-        <name>$l10n_storeItem_douglasBranches1</name>
-        <functions>
-            <function>$l10n_function_decoration</function>
-        </functions>
-        <image>trees/dryBranches/store_douglasBranches.dds</image>
-
-        <price>0</price>
-        <dailyUpkeep>0</dailyUpkeep>
-        <lifetime>1000</lifetime>
-        <rotation>0</rotation>
-        <brand>LIZARDFORESTRY</brand>
-        <species>placeable</species>
-        <category>trees</category>
-        <canBeSold>true</canBeSold>
-        <showInStore>true</showInStore>
-
-        <brush>
-            <type>tree</type>
-            <category>landscaping</category>
-            <tab>trees</tab>
-            <parameters>
-                <parameter>douglasBranches</parameter> <!-- tree type name -->
-                <parameter>1</parameter> <!-- stage -->
-            </parameters>
-        </brush>
-        <vertexBufferMemoryUsage>12032</vertexBufferMemoryUsage>
-        <indexBufferMemoryUsage>2048</indexBufferMemoryUsage>
-        <textureMemoryUsage>1245184</textureMemoryUsage>
-        <audioMemoryUsage>0</audioMemoryUsage>
-        <instanceVertexBufferMemoryUsage>0</instanceVertexBufferMemoryUsage>
-        <instanceIndexBufferMemoryUsage>0</instanceIndexBufferMemoryUsage>
-    </storeData>
-    <base>
-        <filename>trees/dryBranches/drybranches1.i3d</filename>
-    </base>
-    <type>douglasBranches</type> 
-
-</placeable>
->>>>>>> 44bf5fb (latest version)
