@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="douglas_stage06.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="9.0.6"/>
+  </Asset>
+
+  <Files>
+    <File fileId="10" filename="$data/shaders/treeBillboardShader.xml"/>
+    <File fileId="7" filename="$data/shaders/treeBranchShader.xml"/>
+    <File fileId="3" filename="$data/shaders/treeTrunkShader.xml"/>
+    <File fileId="5" filename="Textures/douglasFir_diffuse.dds"/>
+    <File fileId="6" filename="Textures/douglasFir_normal.dds"/>
+    <File fileId="8" filename="Textures/treeLOD_diffuse.dds"/>
+    <File fileId="9" filename="Textures/treeLOD_normal.dds"/>
+    <File fileId="1" filename="Textures/douglasTrunk_diffuse.dds"/>
+    <File fileId="2" filename="Textures/douglasTrunk_normal.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="douglasFir_mat" materialId="5" customShaderId="7">
+      <Texture fileId="5"/>
+      <Normalmap fileId="6" bumpDepth="1.33333"/>
+    </Material>
+    <Material name="douglasLODSS_ma" materialId="6" customShaderId="10">
+      <Texture fileId="8"/>
+      <Normalmap fileId="9"/>
+    </Material>
+    <Material name="douglasTrunk_mat" materialId="21" customShaderId="3">
+      <Texture fileId="1"/>
+      <Normalmap fileId="2"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="douglas_stage06bis.i3d.shapes">
+  </Shapes>
+
+
+  <Dynamics>
+  </Dynamics>
+
+  <Scene>
+      <TransformGroup name="Douglas_stage06" clipDistance="800" nodeId="12" lodDistance="0 80">
+        <Shape shapeId="1" name="Lod0" static="true" collisionMask="16791586" angularDamping="0.15" rollingFriction="0.17" density="0.47" nodeId="31" materialIds="21" castsShadows="true" receiveShadows="true" splitType="2" splitUvs="0 0 1 0.064 1.3">
+          <Shape shapeId="2" name="attachments" nodeId="32" materialIds="5" castsShadows="true" receiveShadows="true"/>
+        </Shape>
+        <Shape shapeId="3" name="Lod1" nodeId="15" materialIds="6" receiveShadows="true"/>
+      </TransformGroup>
+  </Scene>
+
+  <UserAttributes>
+    <UserAttribute nodeId="31">
+      <Attribute name="CanBeMarked" type="boolean" value="true"/>
+    </UserAttribute>
+  </UserAttributes>
+
+</i3D>

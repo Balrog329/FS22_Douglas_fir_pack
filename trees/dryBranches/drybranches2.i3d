@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="drybranches2.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="9.0.6"/>
+  </Asset>
+
+  <Files>
+    <File fileId="1" filename="$data/maps/trees/pine/pineTrunk_diffuse.png"/>
+    <File fileId="2" filename="$data/maps/trees/pine/pineTrunk_normal.png"/>
+    <File fileId="7" filename="$data/shaders/treeBranchShader.xml"/>
+    <File fileId="3" filename="$data/shaders/treeTrunkShader.xml"/>
+    <File fileId="5" filename="drybranches_diffuse.dds"/>
+    <File fileId="6" filename="drybranches_normal.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="pineTrunk_mat" materialId="5" customShaderId="3">
+      <Texture fileId="1"/>
+      <Normalmap fileId="2"/>
+    </Material>
+    <Material name="treeFir2_mat" materialId="6" customShaderId="7">
+      <Texture fileId="5"/>
+      <Normalmap fileId="6"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="drybranches2.i3d.shapes">
+  </Shapes>
+
+
+  <Dynamics>
+  </Dynamics>
+
+  <Scene>
+      <TransformGroup name="DouglasBranches1" clipDistance="800" nodeId="12">
+        <Shape shapeId="1" name="LOD0" rotation="-90 0 0" static="true" collisionMask="16791586" angularDamping="0.1" rollingFriction="0.17" density="0.52" clipDistance="500" nodeId="13" materialIds="5" castsShadows="true" receiveShadows="true" splitType="2" splitUvs="0 0 1 0.064 1.8">
+          <Shape shapeId="2" name="B7" translation="-0.0186968 -0.250818 0.000974594" rotation="13.6569 -66.9371 -129.259" clipDistance="500" nodeId="14" materialIds="6" castsShadows="true" receiveShadows="true"/>
+          <Shape shapeId="3" name="B6" translation="-0.0476342 -0.25363 0.0482089" rotation="-49.0999 -60.9838 -174.473" clipDistance="500" nodeId="15" materialIds="6" castsShadows="true" receiveShadows="true"/>
+          <Shape shapeId="4" name="B1" translation="-0.0237898 -0.271422 0.0150482" rotation="-76.9662 8.49804 -169.463" static="true" collisionMask="16791586" clipDistance="500" nodeId="16" materialIds="6" castsShadows="true" receiveShadows="true"/>
+        </Shape>
+      </TransformGroup>
+  </Scene>
+
+</i3D>
