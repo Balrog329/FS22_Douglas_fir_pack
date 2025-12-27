@@ -1,0 +1,64 @@
+name: Build and Release Mod
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Lire et incrémenter la version
+        id: version
+        run: |
+          version=$(cat version.txt)
+          IFS='.' read -r major minor patch <<< "$version"
+          patch=$((patch+1))
+          new_version="$major.$minor.$patch"
+          echo "$new_version" > version.txt
+          echo "version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Préparer les fichiers du mod
+        run: |
+          mkdir build
+          rsync -av \
+            --exclude='.git' \
+            --exclude='git/*' \
+            --exclude='.github' \
+            --exclude='build' \
+            --exclude='readme.md' \
+            --exclude='CHANGELOG.md' \
+            --exclude='version.txt' \
+            ./ build/
+
+      - name: Créer le ZIP
+        run: |
+          cd build
+          zip -r "../FS22_balrog_trees_pack_v${{ steps.version.outputs.version }}.zip" .
+
+      - name: Créer la release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: "FS22 DOUGLAS FIR PACK v${{ steps.version.outputs.version }}"
+          files: FS22_DOUGLAS_FIR_PACK_v${{ steps.version.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit version.txt
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add version.txt
+          git commit -m "Update version to v${{ steps.version.outputs.version }}"
+          git push
