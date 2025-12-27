@@ -44,7 +44,7 @@ jobs:
       - name: Créer le ZIP
         run: |
           cd build
-          zip -r "../FS22_balrog_trees_pack_v${{ steps.version.outputs.version }}.zip" .
+          zip -r "../FS22_DOUGLAS_FIR_PACK_v${{ steps.version.outputs.version }}.zip" .
 
       - name: Créer la release
         uses: softprops/action-gh-release@v1
